@@ -98,7 +98,118 @@ display:block;
 google.maps.event.addDomListener(window, 'load', initialize);
    
 </script>
+</head><html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+<style>
+#map-canvas
+{
+height: 800px;
+width:800px;
+display:block;
+}
+</style>
+ <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+
+<script language="javascript">
+  
+  
+  function initialize() {
+  
+    var myLatlng = new google.maps.LatLng(37.794108,-122.433);
+    var mapOptions = {
+    zoom:10,
+    center: myLatlng,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+    var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+   
+    var marker = new google.maps.Marker({
+      position: myLatlng,
+      map: map,
+      title: 'Hello World!'
+     
+      });
+    console.log("strat jason");
+   
+    
+ $.getJSON("http://ohanapi.herokuapp.com/api/search?keyword=market", function(data) {
+     var response = data.response;
+     var image ; 
+       for(var i in response ){
+      
+       var longt = response[i].longitude;
+       var latt = response[i].latitude;
+       var name = response[i].name;
+       
+       var myLatlng2 = new google.maps.LatLng(latt,longt);
+       var marker = new google.maps.Marker({
+      position: myLatlng2,
+      map: map,
+      title: name
+   
+      });
+      attachSecretMessage(marker, response[i]);
+      map.setCenter(myLatlng2);
+     }
+ });
+ 
+ }
+  
+  function attachSecretMessage(marker, data) {
+  var contentdata = data.name + "\n" + data.street_address;
+  var urls = data.urls;
+  var payments_accepted = data.payments_accepted;
+  
+  //add content html like below
+  
+  var contentString = '<div id="content">'+
+      '<div id="siteNotice">'+
+      '</div>'+
+      '<h id="firstHeading" class="firstHeading">'+data.name+'</h>'+
+      '<div id="bodyContent">'+
+      
+      '<li>Street Address:'+ data.street_address + '</li>' +
+       '<li>Schedule:'+ data.schedule + '</li>' +
+      '<li>City:'+ data.city + '</li>' +
+       '<li>Payments Accepted:</li>' ; 
+       
+       for(var i in payments_accepted ){
+         contentString = contentString + '<li>'+payments_accepted[i] + '</li>';
+       }
+     contentString = contentString +  '<li>Websites:</li>' ; 
+      for(var i in urls ){
+         contentString = contentString + '<li><a href="'+ urls[i] + '">'+urls[i]+'</a></li>';
+       }
+     contentString = contentString +  '</div>'+
+      '</div>';
+  
+  
+  
+  var infowindow = new google.maps.InfoWindow({
+    content: contentString
+  });
+
+  google.maps.event.addListener(marker, 'click', function() {
+    infowindow.open(marker.get('map'), marker);
+  });
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+   
+</script>
 </head>
+<body>
+
+
+
+<div id="map-canvas"/>
+</body>
+</html>
+
+
 <body>
 
 
